@@ -1,0 +1,99 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 高度工具 */
+.h-0 {
+  height: 0;
+}
+.h-100 {
+  height: 100%;
+}
+.h-auto {
+  height: auto;
+}
+.hv-100 {
+  height: 100vh;
+}
+
+.h-xxxl {
+  height: var(--td-comp-size-xxxl);
+}
+
+
+/* 宽度工具 */
+.w-0 {
+  width: 0;
+}
+.w-100 {
+  width: 100%;
+}
+.w-auto {
+  width: auto;
+}
+.wv-100 {
+  width: 100vw;
+}
+
+
+/* 间距工具 */
+/* margin */
+.m-l {
+  margin-bottom: var(--td-size-6);
+}
+.mt-l {
+  margin-top: var(--td-size-6);
+}
+.mb-l {
+  margin-bottom: var(--td-size-6);
+}
+.ml-l {
+  margin-left: var(--td-size-6);
+}
+.mr-l {
+  margin-right: var(--td-size-6);
+}
+
+.mx-l {
+  margin-left: var(--td-size-6);
+  margin-right: var(--td-size-6);
+}
+.my-l {
+  margin-top: var(--td-size-6);
+  margin-bottom: var(--td-size-6);
+}
+
+
+
+/* padding */
+.p-l {
+  padding: var(--td-size-6);
+}
+.pt-l {
+  padding-top: var(--td-size-6);
+}
+.pb-l {
+  padding-bottom: var(--td-size-6);
+}
+.pl-l {
+  padding-left: var(--td-size-6);
+}
+.pr-l {
+  padding-right: var(--td-size-6);
+}
+
+.px-l {
+  padding-left: var(--td-size-6);
+  padding-right: var(--td-size-6);
+}
+.py-l {  
+  padding-top: var(--td-size-6);
+  padding-bottom: var(--td-size-6);
+}
+
+/* 文本工具 */
+.text-align-center {
+  text-align: center;
+}
