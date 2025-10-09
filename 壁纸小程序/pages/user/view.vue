@@ -11,6 +11,7 @@
 	export default{
 		data() {
 			return{
+				// 后台接口
 				baseUrl: 'https://task.dev.xma.run',
 				_isLoading: true,
 				btnText: '广告加载中',

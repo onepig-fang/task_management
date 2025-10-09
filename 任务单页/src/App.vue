@@ -78,6 +78,10 @@ const showMessage = (theme: string, content = '获取成功', duration = 2000) =
 
 // 后台地址
 const baseURL = 'https://task.dev.xma.run'
+// 视频教程地址
+const videoURL = 'https://www.bilibili.com/bangumi/play/ep733316'
+
+
 
 const loading = ref<boolean>(true)
 const did = useDeviceId()
@@ -95,7 +99,7 @@ const dialogContent = ref<string>('')
 const dialogButton = ref<object>({ content: '警示操作', theme: 'danger' })
 
 const openTeach = () => {
-  window.open('https://www.bilibili.com/bangumi/play/ep733316', '_blank')
+  window.open(videoURL, '_blank')
 }
 
 // 获取链接中的id参数
