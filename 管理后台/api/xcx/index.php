@@ -1,7 +1,7 @@
 <?php
 
 // 获取参数
-$tid = $_POST['id'] ?? null;
+$tid = $_POST['tid'] ?? null;
 $status = $_POST['status'] ?? null;
 
 // 检验参数
@@ -53,7 +53,7 @@ $_DB->query($sql, $params);
 // 返回结果
 $result = [
   'code' => 200,
-  'msg' => '操作成功'
+  'msg' => '解锁成功'
 ];
 echo json_encode($result);
 exit;

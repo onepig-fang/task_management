@@ -24,7 +24,7 @@
 			}
 		},
 		onLoad(options) {
-			if(options.id){
+			if(options.tid){
 				this.web = true;
 				this.tid = options.tid;
 			}
@@ -41,7 +41,8 @@
 			this.stop = Date.now();
 			console.log("页面显示")
 			if(this._rewardedVideoAd == null) {
-				this.btnText = '广告加载中'
+				this._isLoading = true;
+				this.btnText = '广告加载中';
 				let rewardedVideoAd = this._rewardedVideoAd = uni.createRewardedVideoAd({
 					adUnitId: "adunit-4208cc3976c045d8"
 				})
@@ -112,13 +113,13 @@
 						status = 2
 					}
 					uni.request({
-						url: this.baseUrl + "/xcx/",
+						url: this.baseUrl + "/api/xcx/",
 						method: 'POST',
 						header: {
 							'content-type': 'application/x-www-form-urlencoded'
 						},
 						data: {
-							tid: this.id,
+							tid: this.tid,
 							status: status
 						},
 						success: (res) => {

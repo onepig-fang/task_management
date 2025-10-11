@@ -134,7 +134,7 @@
     id: 0,
     name: '',
     appid: '',
-    path: '/pages/user/user',
+    path: 'pages/user/view',
     status: 1 as 0 | 1,
   });
 

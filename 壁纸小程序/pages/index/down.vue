@@ -66,9 +66,9 @@
 									})
 								},
 								fail: (err) => {
-									// console.error("保存图片失败：", err)
+									console.error("保存图片失败：", err)
 									uni.showToast({
-										title: '保存图片失败',
+										title: '保存失败',
 										icon: 'error'
 									})
 								}
@@ -96,6 +96,7 @@
 
 <style>
 	.page-continer {
+		position: relative;
 		width: 100vw;
 		height: 100vh;
 		background-color: #000;
@@ -107,7 +108,7 @@
 	}
 
 	.button-group {
-		position: fixed;
+		position: absolute;
 		bottom: 60rpx;
 		left: 10%;
 		width: 80%;

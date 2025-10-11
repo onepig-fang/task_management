@@ -82,6 +82,7 @@
 
 <style>
   .container {
+    position: relative;
     box-sizing: border-box;
     width: 100vw;
     height: 100vh;
@@ -108,7 +109,7 @@
 
   .search-box {
     box-sizing: border-box;
-    position: fixed;
+    position: absolute;
     bottom: 50rpx;
     left: 3%;
     width: 94%;

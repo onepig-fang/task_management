@@ -16,7 +16,7 @@
 			</button>
 			<view class="function" @click="lookAd">
 				<image src="/static/user/video.svg"></image>
-				<view>随机壁纸</view>
+				<view>高清壁纸</view>
 			</view>
 			<view class="function" @click="work">
 				<image src="/static/user/work.svg"></image>
