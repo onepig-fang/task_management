@@ -80,8 +80,7 @@ location /api/ {
 }
 ```
 - 配置跨域
-[配置跨域教程](https://www.khkj6.com/archives/244.html#wznav_5)
-请参考：解决方法的第1种
+[配置跨域教程](https://www.khkj6.com/archives/244.html#wznav_6) 请参考第1种解决方法
 
 4. 导入数据库
 

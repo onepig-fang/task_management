@@ -33,7 +33,7 @@
   const userStore = useUserStore();
   
   const navToGitHub = () => {
-    window.open('https://github.com/kong-hen/task-management-system');
+    window.open('https://github.com/kong-hen/task_management');
   };
 
   const navToHelper = () => {
