@@ -26,7 +26,7 @@
         left: 10,
         height: 35,
         type: null,
-				typeText: "请选择图片类型"
+        typeText: "请选择图片类型"
       }
     },
     onReady() {
