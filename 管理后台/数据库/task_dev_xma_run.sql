@@ -93,8 +93,10 @@ CREATE TABLE `task_view` (
 
 CREATE TABLE `xcx` (
   `id` int(11) NOT NULL COMMENT '小程序ID',
+  `type` tinyint(1) DEFAULT '1' COMMENT '小程序类型：1非个体，0个体',
   `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '小程序名称',
   `appid` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '小程序AppID',
+  `secret` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '小程序Secret',
   `path` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '小程序广告页面路径',
   `status` tinyint(1) DEFAULT '1' COMMENT '状态：1启用，0禁用',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
