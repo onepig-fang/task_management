@@ -9,11 +9,11 @@ import type {
 import { request } from '@/utils/request';
 
 const Api = {
-  GetList: '/api/admin/xcx/list',
-  Create: '/api/admin/xcx/create',
-  Update: '/api/admin/xcx/update',
-  Delete: '/api/admin/xcx/delete',
-  Status: '/api/admin/xcx/status',
+  GetList: '/xcx/list',
+  Create: '/xcx/create',
+  Update: '/xcx/update',
+  Delete: '/xcx/delete',
+  Status: '/xcx/status',
 };
 
 export function getXcxList(params: ListXcxParams = {}) {

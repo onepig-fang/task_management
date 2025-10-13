@@ -53,11 +53,11 @@ if (!$task || $task['status'] != 1) {
 }
 
 // 随机选取一个小程序
-$xcxList = $_DB->select('xcx', ['appid', 'path'], ['status' => 1], '', 1);
-$xcx = $xcxList[0] ?? null;
+$xcxList = $_DB->select('xcx', ['appid', 'secret', 'path'], ['status' => 1], '', 1);
+$xcxInfo = $xcxList[0] ?? null;
 
 // 检查有可用小程序
-if (!$xcx) {
+if (!$xcxInfo) {
   $result = [
     'code' => 500,
     'msg' => '未配置小程序'
@@ -67,11 +67,22 @@ if (!$xcx) {
 }
 
 // 提取appid字段值
-$appid = $xcx['appid'];
-$path = $xcx['path'];
+$xcxType = $xcxInfo['type'];
+$appid = $xcxInfo['appid'];
+$secret = $xcxInfo['secret'];
+$path = $xcxInfo['path'];
+
+if ($xcxType === 0 && empty($secret)) {
+  $result = [
+    'code' => 500,
+    'msg' => '未配置小程序密钥'
+  ];
+  echo json_encode($result);
+  exit;
+}
 
 // 获取历史观看记录
-$taskViewList = $_DB->select(
+$viewList = $_DB->select(
   'task_view',
   ['*'],
   [
@@ -81,10 +92,10 @@ $taskViewList = $_DB->select(
   '',
   1
 );
-$taskView = $taskViewList[0] ?? null;
+$viewInfo = $viewList[0] ?? null;
 
 // 检查任务完成状态
-if ($taskView && $taskView['status'] > $task['click']) {
+if ($viewInfo && $viewInfo['status'] > $task['click']) {
   // 已完成任务
   $result = [
     'code' => 200,
@@ -101,10 +112,10 @@ if ($taskView && $taskView['status'] > $task['click']) {
 }
 
 // 获取或创建任务视图ID
-if ($taskView) {
-  $taskViewId = $taskView['id'];
+if ($viewInfo) {
+  $viewId = $viewInfo['id'];
 } else {
-  $taskViewId = $_DB->insert(
+  $viewId = $_DB->insert(
     'task_view',
     [
       'task_id' => $tid,
@@ -114,17 +125,17 @@ if ($taskView) {
   );
   // 修改统计信息
   $today = date('Y-m-d');
-  $taskStatsList = $_DB->select(
+  $statsList = $_DB->select(
     'task_stats',
     ['id', 'did'],
     ['task_id' => $tid, 'created_at' => $today]
   );
-  $taskStats = $taskStatsList[0] ?? null;
-  if ($taskStats) {
+  $statsInfo = $statsList[0] ?? null;
+  if ($statsInfo) {
     $_DB->update(
       'task_stats',
-      ['did' => $taskStats['did'] + 1],
-      ['id' => $taskStats['id']]
+      ['did' => $statsInfo['did'] + 1],
+      ['id' => $statsInfo['id']]
     );
   } else {
     $_DB->insert(
@@ -138,8 +149,56 @@ if ($taskView) {
   }
 }
 
-// 拼接urlScheme字符串
-$urlScheme = "weixin://dl/business/?appid={$appid}&path={$path}&query=" . urlencode("vid={$taskViewId}");
+
+// 个体小程序无法使用urlscheme，只能使用小程序码
+if ($xcxType === 1) {
+  $dataType = 'url';
+  // 拼接urlScheme字符串
+  $data = "weixin://dl/business/?appid={$appid}&path={$path}&query=" . urlencode("vid={$viewId}");
+} else {
+  $dataType = 'image';
+  // 获取access_token
+  $tokenUrl = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={$appid}&secret={$secret}";
+  $tokenResponse = file_get_contents($tokenUrl);
+  $tokenData = json_decode($tokenResponse, true);
+  $accessToken = $tokenData['access_token'] ?? null;
+  if (!$accessToken) {
+    $result = [
+      'code' => 500,
+      'msg' => '获取access_token失败'
+    ];
+    echo json_encode($result);
+    exit;
+  }
+
+  // 调用获取小程序码接口
+  $codeUrl = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token={$accessToken}";
+  $codeData = [
+    'scene' => "{$viewId}",
+    'page' => $path
+  ];
+  // 使用CURL发送POST请求
+  $ch = curl_init($codeUrl);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_POST, true);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($codeData));
+  curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+  $codeResponse = curl_exec($ch);
+  // 关闭CURL会话
+  curl_close($ch);
+  if (!$codeResponse) {
+    $result = [
+      'code' => 500,
+      'msg' => '获取小程序码失败'
+    ];
+    echo json_encode($result);
+    exit;
+  }
+  
+  // 编码为base64字符串
+  $data = 'data:image/png;base64,' . base64_encode($codeResponse);
+}
+
 
 // 返回任务未完成结果
 $result = [
@@ -148,7 +207,8 @@ $result = [
   'data' => [
     'title' => $task['name'],
     'click' => $task['click'],
-    'urlScheme' => $urlScheme
+    'url_type' => $dataType,
+    'url' => $data
   ]
 ];
 echo json_encode($result);

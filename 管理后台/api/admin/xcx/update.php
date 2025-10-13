@@ -9,13 +9,15 @@ include '../common/common.php';
 
 // 接收参数
 $id = $inputData['id'] ?? null;
+$type = $inputData['type'] ?? null;
 $name = $inputData['name'] ?? null;
 $appid = $inputData['appid'] ?? null;
+$secret = $inputData['secret'] ?? null;
 $path = $inputData['path'] ?? null;
 $status = $inputData['status'] ?? 1;
 
 // 验证数据不能为空
-if (!is_numeric($id) || empty($name) || empty($appid) || empty($path) || !in_array($status, [0, 1])) {
+if (!is_numeric($id) || !in_array($type, [0, 1]) || empty($name) || empty($appid) || empty($path) || !in_array($status, [0, 1])) {
     $result = [
         'code' => 400,
         'msg' => '参数不能为空',
@@ -34,8 +36,10 @@ $_DB = new DB($dbConfig);
 
 // 更新数据
 $result = $_DB->update('xcx', [
+    'type' => $type,
     'name' => $name,
     'appid' => $appid,
+    'secret' => $secret,
     'path' => $path,
     'status' => $status,
 ], [

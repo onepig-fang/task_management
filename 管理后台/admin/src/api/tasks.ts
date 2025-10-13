@@ -14,14 +14,14 @@ import type {
 import { request } from '@/utils/request';
 
 const Api = {
-  GetList: '/api/admin/tasks/list',
-  Create: '/api/admin/tasks/create',
-  Update: '/api/admin/tasks/update',
-  Delete: '/api/admin/tasks/delete',
-  Status: '/api/admin/tasks/status',
-  Week: '/api/admin/tasks/week',
-  View: '/api/admin/tasks/view',
-  Domain: '/api/admin/tasks/domain',
+  GetList: '/tasks/list',
+  Create: '/tasks/create',
+  Update: '/tasks/update',
+  Delete: '/tasks/delete',
+  Status: '/tasks/status',
+  Week: '/tasks/week',
+  View: '/tasks/view',
+  Domain: '/tasks/domain',
 };
 
 export function getTaskList(params: ListTasksParams) {

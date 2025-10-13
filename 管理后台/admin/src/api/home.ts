@@ -2,7 +2,7 @@ import type { HomeResult } from '@/api/model/homeModel';
 import { request } from '@/utils/request';
 
 const Api = {
-  home: '/api/admin/home/index',
+  home: '/home/index',
 };
 
 export function getHomeData() {

@@ -1,6 +1,6 @@
 <template>
 	<view class="page-continer">
-		<image :src="src" mode="aspectFill" class="image"></image>
+		<image :src="src" :mode="type==1?'aspectFill':'aspectFit'" class="image"></image>
 		<view class="button-group">
 			<button class="back-btn" @click="toBack">
 				<image src="/static/index/back.svg" mode="aspectFit" class="icon"></image>
@@ -22,11 +22,13 @@
 	export default {
 		data() {
 			return {
-				src: ''
+				src: '',
+				type: 1
 			}
 		},
 		onLoad(options) {
 			this.src = options.src
+			this.type = options.type
 		},
 		onShareAppMessage() {
 			return {
@@ -96,6 +98,7 @@
 
 <style>
 	.page-continer {
+		overflow: hidden;
 		position: relative;
 		width: 100vw;
 		height: 100vh;

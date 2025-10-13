@@ -9,6 +9,11 @@
       </t-space>
       <t-table :data="list" :columns="columns" :row-key="rowKey" :loading="loading" :hover="true" size="medium"
         :selected-row-keys="selectedRowKeys" @select-change="onSelectChange" tableLayout="fixed" style="width: 100%;">
+
+        <template #type="{ row }">
+          <t-tag :theme="row.type === 1 ? 'primary' : 'success'">{{ row.type === 1 ? '非个体' : '个体' }}</t-tag>
+        </template>
+
         <template #status="{ row }">
           <t-switch size="small" :value="row.status === 1" @change="(val: boolean) => onToggleStatus(row, val)" />
         </template>
@@ -33,15 +38,24 @@
   <t-dialog v-model:visible="dialogVisible" attach="body" :z-index="5000" :header="isEdit ? '修改小程序' : '新增小程序'"
     :confirm-btn="{ content: isSubmitting ? '提交中...' : '确定', theme: 'primary', loading: isSubmitting }"
     :cancel-btn="{ content: '取消' }" @confirm="onSubmit">
-    <t-form ref="formRef" :data="form" :rules="isEdit ? rulesEdit : rulesCreate" label-align="left" :label-width="100">
+    <t-form ref="formRef" :data="form" :rules="isEdit ? rulesEdit : rulesCreate" label-align="left" :label-width="100" :status-icon="true">
       <t-form-item v-if="isEdit" label="ID" name="id">
         <t-input :value="form.id" disabled />
+      </t-form-item>
+      <t-form-item label="类型" name="type">
+        <t-radio-group v-model="form.type">
+          <t-radio :value="1">非个体</t-radio>
+          <t-radio :value="0">个体</t-radio>
+        </t-radio-group>
       </t-form-item>
       <t-form-item label="名称" name="name">
         <t-input v-model="form.name" placeholder="请输入小程序名称" clearable />
       </t-form-item>
       <t-form-item label="AppID" name="appid">
         <t-input v-model="form.appid" placeholder="请输入AppID" clearable />
+      </t-form-item>
+      <t-form-item v-show="form.type === 0" label="小程序密钥" help="个体小程序密钥必填" name="secret">
+        <t-input v-model="form.secret" placeholder="请输入小程序密钥" clearable />
       </t-form-item>
       <t-form-item label="广告路径" name="path">
         <t-input v-model="form.path" placeholder="请输入广告路径" clearable />
@@ -65,10 +79,7 @@
 
 </template>
 
-<script
-  setup
-  lang="ts"
->
+<script setup lang="ts">
   import { ref, reactive, onMounted } from 'vue';
   import { MessagePlugin } from 'tdesign-vue-next';
   import { getXcxList, createXcx, updateXcx, deleteXcx, updateXcxStatus } from '@/api/xcx';
@@ -87,8 +98,10 @@
   const columns = [
     { colKey: 'row-select', type: 'multiple', width: 50, fixed: 'left' },
     { title: 'ID', colKey: 'id', width: 70, fixed: 'left' },
+    { title: '类型', colKey: 'type', width: 100 },
     { title: '名称', colKey: 'name', width: 140, fixed: 'left', ellipsis: true },
     { title: 'AppID', colKey: 'appid', width: 200 },
+    { title: '小程序密钥', colKey: 'secret', width: 200, ellipsis: true },
     { title: '广告路径', colKey: 'path', minWidth: 260, ellipsis: true },
     { title: '创建时间', colKey: 'created_at', width: 200 },
     { title: '修改时间', colKey: 'updated_at', width: 200 },
@@ -132,8 +145,10 @@
 
   const initForm = () => ({
     id: 0,
+    type: 1 as 0 | 1,
     name: '',
     appid: '',
+    secret: '',
     path: 'pages/user/view',
     status: 1 as 0 | 1,
   });
@@ -142,8 +157,11 @@
 
   /* 新增小程序表单验证规则 */
   const rulesCreate = {
+    type: [{ required: true, message: '请选择类型', type: 'error', trigger: 'change' }],
     name: [{ required: true, message: '请输入小程序名称', type: 'error', trigger: 'blur' }],
     appid: [{ required: true, message: '请输入AppID', type: 'error', trigger: 'blur' }],
+    secret: [{ required: true, message: '个体小程序密钥必填', type: 'error', trigger: 'blur' },
+    { validator: (val: string) => form.type===0 && val.length > 0, message: '个体小程序密钥必填' , type: 'error', trigger: 'blur' }, ],
     path: [{ required: true, message: '请输入广告路径', type: 'error', trigger: 'blur' }],
   };
 
@@ -151,7 +169,7 @@
   const rulesEdit = {
     id: [{ required: true, message: 'ID异常', type: 'error', trigger: 'blur' }],
     ...rulesCreate,
-    status: [{ required: true, message: '请选择状态', type: 'error', trigger: 'change' }],
+    status: [{ required: true, message: '请选择状态' }],
   };
 
   /* 点击创建按钮 */
@@ -165,8 +183,10 @@
   function openEdit(row: XcxItem) {
     Object.assign(form, {
       id: row.id,
+      type: row.type as 0 | 1,
       name: row.name,
       appid: row.appid,
+      secret: row.secret,
       path: row.path,
       status: row.status as 0 | 1,
     });
@@ -182,14 +202,16 @@
       .validate()
       .then(() => {
         const payload: any = {
+          type: form.type,
           name: form.name,
           appid: form.appid,
+          secret: form.secret,
           path: form.path,
         };
         const req = isEdit.value ? updateXcx({ id: form.id, ...payload, status: form.status } as UpdateXcxParams) : createXcx(payload as CreateXcxParams);
         return req
           .then((res) => {
-            MessagePlugin.success(isEdit.value ? '修改成功' : '新增成功');
+            MessagePlugin.success(res.msg || (isEdit.value ? '修改成功' : '新增成功'));
             dialogVisible.value = false;
             fetchList();
           })
@@ -210,8 +232,8 @@
   /* 删除单个小程序 */
   function onDelete(id: number) {
     deleteXcx({ ids: [id] } as DeleteXcxParams)
-      .then(() => {
-        MessagePlugin.success('删除成功');
+      .then((res) => {
+        MessagePlugin.success(res.msg || '删除成功');
         fetchList();
       })
       .catch((err) => {
@@ -227,8 +249,8 @@
   function onBatchDelete() {
     if (selectedRowKeys.value.length === 0) return;
     deleteXcx({ ids: selectedRowKeys.value as number[] } as DeleteXcxParams)
-      .then(() => {
-        MessagePlugin.success('批量删除成功');
+      .then((res) => {
+        MessagePlugin.success(res.msg || '批量删除成功');
         selectedRowKeys.value = [];
         fetchList();
       })

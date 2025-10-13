@@ -2,8 +2,8 @@ import type { UserParams, UserListResult, UpdatePointsParams } from '@/api/model
 import { request } from '@/utils/request';
 
 const Api = {
-  GetList: '/api/user/list',
-  UpdatePoints: '/api/user/points',
+  GetList: '/user/list',
+  UpdatePoints: '/user/points',
 };
 
 export function getUserList(params: UserParams = {}) {

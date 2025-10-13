@@ -37,7 +37,7 @@
   <t-dialog v-model:visible="dialogVisible" attach="body" :z-index="5000" :header="isEdit ? '修改域名' : '新增域名'"
     :confirm-btn="{ content: isSubmitting ? '提交中...' : '确定', theme: 'primary', loading: isSubmitting }"
     :cancel-btn="{ content: '取消' }" @confirm="onSubmit">
-    <t-form ref="formRef" :data="form" :rules="isEdit ? rulesEdit : rulesCreate" label-align="left" :label-width="100">
+    <t-form ref="formRef" :data="form" :rules="isEdit ? rulesEdit : rulesCreate" label-align="left" :label-width="100" :status-icon="true">
       <t-form-item v-if="isEdit" label="ID" name="id">
         <t-input :value="form.id" disabled />
       </t-form-item>
@@ -162,7 +162,7 @@
   const rulesEdit = {
     id: [{ required: true, message: 'ID异常', type: 'error', trigger: 'blur' }],
     ...rulesCreate,
-    status: [{ required: true, message: '请选择状态', type: 'error', trigger: 'change' }],
+    status: [{ required: true, message: '请选择状态' }],
   };
 
   /* 点击创建按钮 */
@@ -197,8 +197,8 @@
         };
         const req = isEdit.value ? updateDomain({ id: form.id, ...payload, status: form.status } as UpdateDomainParams) : createDomain(payload);
         return req
-          .then(() => {
-            MessagePlugin.success(isEdit.value ? '修改成功' : '新增成功');
+          .then((res) => {
+            MessagePlugin.success(res.msg || (isEdit.value ? '修改成功' : '新增成功'));
             dialogVisible.value = false;
             fetchList();
           })
@@ -219,8 +219,8 @@
   /* 删除单个域名 */
   function onDelete(id: number) {
     deleteDomainsByIds({ ids: [id] } as DeleteDomainsParams)
-      .then(() => {
-        MessagePlugin.success('删除成功');
+      .then((res) => {
+        MessagePlugin.success(res.msg || '删除成功');
         fetchList();
       })
       .catch((err) => {
@@ -236,8 +236,8 @@
   function onBatchDelete() {
     if (selectedRowKeys.value.length === 0) return;
     deleteDomainsByIds({ ids: selectedRowKeys.value as number[] } as DeleteDomainsParams)
-      .then(() => {
-        MessagePlugin.success('批量删除成功');
+      .then((res) => {
+        MessagePlugin.success(res.msg || '批量删除成功');
         selectedRowKeys.value = [];
         fetchList();
       })

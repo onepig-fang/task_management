@@ -51,7 +51,14 @@
   <!-- 奖励弹窗 -->
   <t-dialog v-model:visible="isShowDialog" close-on-overlay-click :content="dialogContent" cancel-btn="取消"
     :confirm-btn="dialogButton" @confirm="getReward"></t-dialog>
+
+  <!-- 展示个体二维码 -->
+  <t-popup v-model="showQrcode" placement="center" destroy-on-close style="width: 80%;padding: 20px;">
+    <img class="qrcode-image" :src="url" alt="个体二维码" />
+    <div class="qrcode-text">请使用微信扫描二维码</div>
+  </t-popup>
 </template>
+
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted } from 'vue'
   import axios from 'axios'
@@ -84,13 +91,16 @@
   const status = ref<boolean>(false)
   const title = ref<string>('任务标题')
   const click = ref<boolean>(true)
-  const urlScheme = ref<string>('')
+  const urlType = ref<string>('url')
+  const url = ref<string>('')
   const type = ref<number>(0)
   const award = ref<string>('')
 
   const isShowDialog = ref<boolean>(false)
   const dialogContent = ref<string>('')
   const dialogButton = ref<object>({ content: '警示操作', theme: 'danger' })
+
+  const showQrcode = ref<boolean>(false)
 
   const openTeach = () => {
     window.open(videoURL, '_blank')
@@ -129,14 +139,15 @@
             showMessage('success', data.msg)
             isShowDialog.value = true
           } else if (data.code === 400) {
-            urlScheme.value = data.data.urlScheme
-            if (click.value) {
-              dialogContent.value =
-                '点击”跳转“按钮跳转到小程序后，完整观看广告后，需要点击广告并体验5秒以上，再返回即可领取奖励！'
-            } else {
-              dialogContent.value = '点击”跳转“按钮跳转到小程序后，完整观看广告后，返回即可领取奖励！'
-            }
-            dialogButton.value = { content: '跳转', theme: 'primary' }
+            urlType.value = data.data.url_type
+            url.value = data.data.url
+            
+            const action = urlType.value === 'image' ? '查看' : '跳转';
+            const method = urlType.value === 'image' ? '查看小程序二维码，使用微信扫码' : '跳转到小程序后';
+            const extraStep = click.value ? '需要点击广告并体验5秒以上，再' : '';
+
+            dialogContent.value = `点击"${action}"按钮${method}，完整观看广告后，${extraStep}返回即可领取奖励！`;
+            dialogButton.value = { content: action, theme: 'primary' };
             showMessage('error', data.msg)
           } else {
             showMessage('error', '未知错误')
@@ -167,7 +178,14 @@
         }
       }
     } else {
-      window.location.href = urlScheme.value
+      if(urlType.value == 'url') {
+        window.location.href = url.value
+      }else if (urlType.value == 'image') {
+        showQrcode.value = true
+      }else {
+        error.value = true
+        errMsg.value = '小程序链接错误'
+      }
     }
   }
 
@@ -324,5 +342,17 @@
     transition: all 0.3s ease;
     box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);
     margin-top: 10px;
+  }
+
+  .qrcode-image {
+    width: 100%;
+  }
+
+  .qrcode-text {
+    margin-top: 15px;
+    width: 100%;
+    color: #000;
+    font-size: 16px;
+    text-align: center;
   }
 </style>

@@ -9,11 +9,11 @@ import type {
 import { request } from '@/utils/request';
 
 const Api = {
-  GetList: '/api/admin/domains/list',
-  Create: '/api/admin/domains/create',
-  Delete: '/api/admin/domains/delete',
-  Status: '/api/admin/domains/status',
-  Update: '/api/admin/domains/update',
+  GetList: '/domains/list',
+  Create: '/domains/create',
+  Delete: '/domains/delete',
+  Status: '/domains/status',
+  Update: '/domains/update',
 };
 
 export function getDomainList(params: ListDomainParams = {}) {

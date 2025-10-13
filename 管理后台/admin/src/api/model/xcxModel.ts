@@ -1,7 +1,9 @@
 export interface XcxItem {
   id: number;
+  type: 0 | 1;
   name: string;
   appid: string;
+  secret: string;
   path: string;
   status: 0 | 1;
   created_at: string;
@@ -21,8 +23,10 @@ export interface ListXcxParams {
 }
 
 export interface CreateXcxParams {
+  type: 0 | 1;
   name: string;
   appid: string;
+  secret: string;
   path: string;
 }
 

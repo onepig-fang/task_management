@@ -2,7 +2,7 @@ import type { LoginParams, LoginResult } from '@/api/model/adminModel';
 import { request } from '@/utils/request';
 
 const Api = {
-  Login: '/api/admin/login',
+  Login: '/login',
 };
 
 export function login(data: LoginParams) {

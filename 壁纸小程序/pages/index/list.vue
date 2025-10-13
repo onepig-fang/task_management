@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view class="image-continer">
-			<view v-for="(item, index) in list" :key="index" class="image-box">
+			<view v-for="(item, index) in list" :key="index" class="image-box" :style="'height:'+(type==1?'var(--photo-height)':'var(--head-height)')+';'">
 				<image v-show="item.loading" src="/static/index/loading.gif" mode="aspectFit"></image>
 				<image v-show="!item.loading" :lazy-load="true" :src="item.src" mode="aspectFill" :data-index="index"
 					@load="imgLoadOk" @click="toDown(item.src)"></image>
@@ -22,6 +22,8 @@
 			return {
 				loading: true,
 				more: true,
+				type: 1,
+				typeText: '壁纸',
 				key: '',
 				start: 0,
 				list: [],
@@ -32,8 +34,16 @@
 		onLoad(options) {
 			// 获取传输的关键词
 			this.key = options.key
+			this.type = options.type
+			if(options.type == 3) {
+				this.typeText = '表情包'
+			}else if(options.type == 2) {
+				this.typeText = '头像'
+			}else {
+				this.typeText = '壁纸'
+			}
 			uni.setNavigationBarTitle({
-				title: decodeURIComponent(this.key) + '壁纸'
+				title: decodeURIComponent(this.key) + this.typeText
 			})
 		},
 		onReady() {
@@ -78,7 +88,7 @@
 			getList() {
 				this.loading = true
 				uni.request({
-					url: 'https://www.duitang.com/napi/blog/list/by_search/?kw=' + this.key + '%E5%A3%81%E7%BA%B8&start=' + this.start,
+					url: 'https://www.duitang.com/napi/blog/list/by_search/?kw=' + this.key + decodeURIComponent(this.typeText) + '&start=' + this.start,
 					method: 'GET',
 					success: (res) => {
 						const data = res.data
@@ -114,7 +124,7 @@
 			},
 			toDown(src) {
 				uni.navigateTo({
-					url: '/pages/index/down?src=' + src
+					url: '/pages/index/down?src=' + src + '&type=' + this.type
 				})
 			},
 			goTop() {
@@ -127,6 +137,10 @@
 </script>
 
 <style>
+	page {
+		--photo-height: calc((100vw - 72rpx) / 3 * 2);
+		--head-height: calc((100vw - 72rpx) / 3);
+	}
 	.toast {
 		width: 100%;
 		height: 100rpx;
@@ -150,7 +164,6 @@
 
 	.image-box {
 		width: 100%;
-		height: calc((100vw - 72rpx) / 3 * 2);
 	}
 
 	.image-box image {

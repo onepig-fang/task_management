@@ -1,6 +1,7 @@
 <template>
   <view class="container" :style="'background-image: url(' + backgroundUrl + ');'">
-    <view class="user-box" @click="goUser" :style="'top: ' + top + 'px; left: ' + left + 'px; height: ' + height + 'px; width: ' + height + 'px;'">
+    <view class="user-box" @click="goUser"
+      :style="'top: ' + top + 'px; left: ' + left + 'px; height: ' + height + 'px; width: ' + height + 'px;'">
       <image src="/static/index/user.svg"></image>
     </view>
     <view class="search-box">
@@ -8,6 +9,7 @@
         <view class="search-title"><text>搜壁纸</text></view>
         <view class="search-subtitle"><text>好壁纸，一搜就有</text></view>
         <input v-model="text" placeholder="请输入关键词" class="search-input" placeholder-class="search-placeholder" />
+        <button class="search-button" @click="chooseType">{{ typeText }}</button>
         <button class="search-button" @click="handleSearch">搜索</button>
       </view>
     </view>
@@ -23,7 +25,9 @@
         top: 20,
         left: 10,
         height: 35,
-      };
+        type: null,
+				typeText: "请选择图片类型"
+      }
     },
     onReady() {
 			// 获取屏幕宽度
@@ -36,6 +40,18 @@
 			this.height = menuButtonInfo.height
 			this.getPhoto();
     },
+		onShareAppMessage() {
+			return {
+				title: '爱搜壁纸',
+				path: '/pages/index/index'
+			}
+		},
+		onShareTimeline() {
+			return {
+				title: '爱搜壁纸',
+				path: '/pages/index/index'
+			}
+		},
     methods: {
       getPhoto() {
         uni.request({
@@ -63,16 +79,30 @@
 					url: "/pages/user/user"
 				})
 			},
+      chooseType() {
+				uni.showActionSheet({
+					itemList: ['壁纸', '头像', '表情包'],
+					success: (res) => {
+						this.type = res.tapIndex + 1
+						this.typeText = res.tapIndex === 0 ? '壁纸' : res.tapIndex === 1 ? '头像' : '表情包'
+					}
+				})
+			},
       handleSearch() {
 				const key = this.text.trim()
-				if (key) {
+				if (this.type == null) {
+					uni.showToast({
+					  title: '请选择图片类型',
+					  icon: 'error'
+					});
+				}else if (key) {
           uni.navigateTo({
-            url: '/pages/index/list?key=' + encodeURIComponent(key)
+            url: '/pages/index/list?key=' + encodeURIComponent(key) + '&type=' + this.type
           });
         } else {
           uni.showToast({
             title: '请输入搜索内容',
-            icon: 'none'
+            icon: 'error'
           });
         }
       }
@@ -113,7 +143,7 @@
     bottom: 50rpx;
     left: 3%;
     width: 94%;
-    height: 500rpx;
+    min-height: 500rpx;
     background-color: rgba(255, 255, 255, 0.7);
 		backdrop-filter: blur(5px);
     border-radius: 70rpx;

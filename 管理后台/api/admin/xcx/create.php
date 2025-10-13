@@ -8,12 +8,14 @@ include '../common/common.php';
 
 
 // 接收参数
-$xcxName = $inputData['name'] ?? null;
-$xcxAppid = $inputData['appid'] ?? null;
-$xcxPath = $inputData['path'] ?? null;
+$type = $inputData['type'] ?? null;
+$name = $inputData['name'] ?? null;
+$appid = $inputData['appid'] ?? null;
+$secret = $inputData['secret'] ?? null;
+$path = $inputData['path'] ?? null;
 
 // 验证数据不能为空
-if (empty($xcxName) || empty($xcxAppid) || empty($xcxPath)) {
+if (!in_array($type, [0, 1]) || empty($name) || empty($appid) || empty($path)) {
     $result = [
         'code' => 400,
         'msg' => '参数不能为空',
@@ -32,9 +34,11 @@ $_DB = new DB($dbConfig);
 
 // 插入数据
 $id = $_DB->insert('xcx', [
-    'name' => $xcxName,
-    'appid' => $xcxAppid,
-    'path' => $xcxPath,
+    'type' => $type,
+    'name' => $name,
+    'appid' => $appid,
+    'secret' => $secret,
+    'path' => $path,
 ]);
 
 // 返回结果

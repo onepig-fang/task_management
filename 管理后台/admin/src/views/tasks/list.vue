@@ -45,7 +45,7 @@
   <t-dialog v-model:visible="dialogVisible" attach="body" :z-index="5000" :header="isEdit ? '修改任务' : '新增任务'"
     :confirm-btn="{ content: isSubmitting ? '提交中...' : '确定', theme: 'primary', loading: isSubmitting }"
     :cancel-btn="{ content: '取消' }" @confirm="onSubmit">
-    <t-form ref="formRef" :data="form" :rules="isEdit ? rulesEdit : rulesCreate" label-align="left" :label-width="100">
+    <t-form ref="formRef" :data="form" :rules="isEdit ? rulesEdit : rulesCreate" label-align="left" :label-width="100" :status-icon="true">
       <t-form-item v-if="isEdit" label="ID" name="id">
         <t-input :value="form.id" disabled />
       </t-form-item>
@@ -190,17 +190,18 @@
   /* 新增小程序表单验证规则 */
   const rulesCreate = {
     name: [{ required: true, message: '请输入任务名称', type: 'error', trigger: 'blur' }],
-    domain: [{ required: true, message: '请输入域名', type: 'error', trigger: 'blur' }],
-    type: [{ required: true, message: '请选择奖励类型', type: 'error', trigger: 'change' }],
+    domain: [{ required: true, message: '域名必选', type: 'error', trigger: 'blur' }, 
+    { required: true, message: '域名必选', type: 'error', trigger: 'change' },],
+    type: [{ required: true, message: '请选择奖励类型' }],
     award: [{ required: true, message: '请输入奖励内容', type: 'error', trigger: 'blur' }],
-    click: [{ required: true, message: '请选择强点广告', type: 'error', trigger: 'change' }],
+    click: [{ required: true, message: '是否开启强点广告' }],
   };
 
   /* 修改小程序表单验证规则 */
   const rulesEdit = {
     id: [{ required: true, message: 'ID异常', type: 'error', trigger: 'blur' }],
     ...rulesCreate,
-    status: [{ required: true, message: '请选择状态', type: 'error', trigger: 'change' }],
+    status: [{ required: true, message: '请选择状态' }],
   };
 
   /* 点击创建按钮 */
@@ -241,8 +242,8 @@
         };
         const req = isEdit.value ? updateTask({ id: form.id, ...payload, status: form.status } as UpdateTaskParams) : createTask(payload as CreateTaskParams);
         return req
-          .then(() => {
-            MessagePlugin.success(isEdit.value ? '修改成功' : '新增成功');
+          .then((res) => {
+            MessagePlugin.success(res.msg || (isEdit.value ? '修改成功' : '新增成功'));
             dialogVisible.value = false;
             fetchList();
           })
@@ -290,8 +291,8 @@
   function onBatchDelete() {
     if (selectedRowKeys.value.length === 0) return;
     deleteTasks({ ids: selectedRowKeys.value as number[] } as DeleteTasksParams)
-      .then(() => {
-        MessagePlugin.success('批量删除成功');
+      .then((res) => {
+        MessagePlugin.success(res.msg || '批量删除成功');
         selectedRowKeys.value = [];
         fetchList();
       })

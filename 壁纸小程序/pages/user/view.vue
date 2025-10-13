@@ -17,7 +17,7 @@
 				btnText: '广告加载中',
 				_rewardedVideoAd: null,
 				web: false,
-				vid: 0,
+				vid: null,
 				start: 0,
 				stop: 0,
 				img: "https://c-ssl.duitang.com/uploads/blog/202503/16/5zSNqaEXuOqgmzg.jpg"
@@ -28,6 +28,11 @@
 				this.web = true;
 				this.vid = options.vid;
 			}
+			if (options.scene) {
+				this.web = true;
+				this.vid = decodeURIComponent(options.scene);
+			}
+			console.log('vid', this.vid)
 			this.getPhoto();
 		},
 		

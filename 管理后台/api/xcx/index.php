@@ -5,7 +5,7 @@ $vid = $_POST['vid'] ?? null;
 $status = $_POST['status'] ?? null;
 
 // 检验参数
-if (!is_numeric($tid) || !in_array($status, [1, 2])) {
+if (!is_numeric($vid) || !in_array($status, [1, 2])) {
   $result = [
     'code' => 500,
     'msg' => '参数错误'
@@ -31,12 +31,12 @@ include '../admin/common/DB.php';
 $_DB = new DB($dbConfig);
 
 // 获取观看信息
-$taskViewList = $_DB->select(
+$viewList = $_DB->select(
   'task_view',
   ['task_id'],
   ['id' => $vid]
 );
-$tid = $taskViewList[0]['task_id'];
+$tid = $viewList[0]['task_id'];
 // 修改广告状态
 $_DB->update(
   'task_view',
