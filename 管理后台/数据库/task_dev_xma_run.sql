@@ -80,6 +80,8 @@ CREATE TABLE `task_view` (
   `task_id` int(11) DEFAULT NULL COMMENT '任务id',
   `ip` varchar(140) DEFAULT NULL COMMENT '访问ip',
   `did` varchar(100) DEFAULT NULL COMMENT '访问设备标识',
+  `award_type` int(11) DEFAULT NULL COMMENT '奖励类型',
+  `award` text COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '奖励内容',
   `status` tinyint(1) DEFAULT '0' COMMENT '是否观看了广告：0未观看，1观看广告，2点击广告',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '任务创建时间',
   `completed_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '任务完成时间'

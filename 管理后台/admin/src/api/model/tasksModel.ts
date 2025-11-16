@@ -68,6 +68,8 @@ export interface ViewItem {
   task_id: number;
   ip: string;
   did: string;
+  award_type: 1 | 2 | 3;
+  award: string;
   status: 0 | 1 | 2;
   url: string;
   created_at: string;

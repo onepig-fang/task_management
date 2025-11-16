@@ -5,14 +5,15 @@
       <t-table :data="list" :columns="columns" row-key="id" :loading="loading" :hover="true" size="medium"
         tableLayout="fixed" style="width: 100%;">
         <template #status="{ row }">
-          <t-tag v-if="row.status === 2" shape="round" theme="success" variant="light-outline">
-            已点击
+          <t-tag shape="round" :theme="row.status === 2 ? 'success' : (row.status === 1 ? 'warning' : 'danger')"
+            variant="light-outline">
+            {{ row.status === 2 ? '已点击' : (row.status === 1 ? '已观看' : '未完成') }}
           </t-tag>
-          <t-tag v-else-if="row.status === 1" shape="round" theme="warning" variant="light-outline">
-            已观看
-          </t-tag>
-          <t-tag v-else shape="round" theme="danger" variant="light-outline">
-            未完成
+        </template>
+        <template #award_type="{ row }">
+          <t-tag shape="round" :theme="row.award_type === 1 ? 'primary' : (row.award_type === 2 ? 'success' : (row.award_type === 3 ? 'warning' : 'danger'))"
+            variant="light-outline">
+            {{ row.award_type === 1 ? '链接' : (row.award_type === 2 ? '文本' : (row.award_type === 3 ? '卡密' : '未知')) }}
           </t-tag>
         </template>
       </t-table>
@@ -43,6 +44,8 @@
     { title: '任务ID', colKey: 'task_id', width: 80, fixed: 'left', ellipsis: true },
     { title: '访问IP', colKey: 'ip', width: 140, ellipsis: true },
     { title: '设备识别码', colKey: 'did', width: 180, ellipsis: true },
+    { title: '奖励类型', colKey: 'award_type', width: 100 },
+    { title: '奖励内容', colKey: 'award', width: 200, ellipsis: true },
     { title: '状态', colKey: 'status', width: 100 },
     { title: '创建时间', colKey: 'created_at', width: 200 },
     { title: '完成时间', colKey: 'completed_at', width: 200 },

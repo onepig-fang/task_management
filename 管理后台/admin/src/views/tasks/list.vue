@@ -11,8 +11,8 @@
         :selected-row-keys="selectedRowKeys" @select-change="onSelectChange" tableLayout="fixed" style="width: 100%;">
 
         <template #type="{ row }">
-          <t-tag shape="round" :theme="row.type === 1 ? 'primary' : 'warning'" variant="light-outline">
-            {{ row.type === 1 ? '链接' : '文本' }}
+          <t-tag shape="round" :theme="row.type === 1 ? 'primary' : (row.type === 2 ? 'success' : 'warning')" variant="light-outline">
+            {{ row.type === 1 ? '链接' : (row.type === 2 ? '文本' : '卡密') }}
           </t-tag>
         </template>
 

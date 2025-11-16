@@ -168,7 +168,7 @@
     if (status.value) {
       if (type.value == 1) {
         window.location.href = award.value
-      } else if (type.value == 2) {
+      } else {
         // 将award的值写入剪切板
         try {
           navigator.clipboard.writeText(award.value)

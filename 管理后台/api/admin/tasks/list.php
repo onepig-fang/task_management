@@ -1,6 +1,9 @@
 <?php
 
 // 定义请求方式
+
+use function PHPSTORM_META\map;
+
 $method = "GET";
 
 // 导入公共代码
@@ -33,6 +36,14 @@ $offset = ($page - 1) * $limit;
 // 查询数据
 $list = $_DB->select('tasks', ['*'], [], 'created_at DESC', $limit, $offset);
 $total = $_DB->count('tasks');
+
+// 处理卡密类型奖励
+foreach ($list as &$item) {
+    if ($item['type'] == 3) {
+        $item['award'] = str_replace('|', "\n", $item['award']);
+    }
+}
+unset($item);
 
 
 // 返回结果
