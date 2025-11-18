@@ -37,14 +37,12 @@ $appInfo = getAppInfo($_DB, $appid);
 $appid = $appInfo['appid'];
 $secret = $appInfo['secret'];
 
-// 获取用户登录session_key
-$sessionData = getSessionKey($appid, $secret, $js_code);
-
-// 获取微信access_token
-$accessToken = getAccessToken($appid, $secret);
+// 获取用户登录session_key和access_token
+$sessionData = getSessionList($appid, $secret, $js_code);
 
 // 使用session_key对空字串签名
-$signature = hash_hmac('sha256', "", $sessionData['session_key']);
+$accessToken = $sessionData['access_token'] ?? null;
+$signature = hash_hmac('sha256', '', $sessionData['session_key']);
 $openid = $sessionData['openid'] ?? null;
 
 // 获取用户encryptKey
@@ -52,7 +50,7 @@ $encryptKey = getSignatureKey($accessToken, $openid, $signature, $version);
 
 // 校验签名
 if (!SignatureUtil::verify($_POST, $encryptKey)) {
-  returnJson(400, "签名不一致");
+  returnJson(400, '签名不一致');
 }
 
 // 获取观看信息

@@ -74,13 +74,14 @@ if ($viewInfo) {
     ]);
   } else if ($viewInfo['status'] == 1) {
     $msg = "未点击并体验广告超过5秒，请重试";
-  }else {
+  } else {
     $msg = "任务未完成";
   }
 } else {
   // 创建新记录并更新统计
   $viewId = createNewViewRecord($_DB, $tid, $ip, $did);
   updateTaskStats($_DB, $tid);
+  $msg = "任务未完成";
 }
 
 // 生成小程序访问数据

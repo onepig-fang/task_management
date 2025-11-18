@@ -38,33 +38,56 @@ function getAppInfo($db, $appid) {
 
 
 /**
- * 获取微信access_token
+ * 同时获取微信 access_token 和用户 session 信息
  */
-function getAccessToken($appid, $secret) {
-  //获取微信access_token
-  $tokenUrl = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={$appid}&secret={$secret}";
-  $tokenResponse = file_get_contents($tokenUrl);
-  $tokenData = json_decode($tokenResponse, true);
-  $accessToken = $tokenData['access_token'] ?? null;
-  if (empty($accessToken)) {
-    returnJson(400, "小程序信息错误");
-  }
-  return $accessToken;
-}
+function getSessionList($appid, $secret, $js_code) {
+  $urls = [
+    "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={$appid}&secret={$secret}",
+    "https://api.weixin.qq.com/sns/jscode2session?appid={$appid}&secret={$secret}&js_code={$js_code}&grant_type=authorization_code"
+  ];
 
+  // 初始化 cURL Multi
+  $mh = curl_multi_init();
+  $handles = [];
 
-/**
- * 获取用户session_key
- */
-function getSessionKey($appid, $secret, $js_code) {
-  $sessionUrl = "https://api.weixin.qq.com/sns/jscode2session?appid={$appid}&secret={$secret}&js_code={$js_code}&grant_type=authorization_code";
-  $sessionResponse = file_get_contents($sessionUrl);
-  $sessionData = json_decode($sessionResponse, true);
-  $errCode = $sessionData['errcode'] ?? null;
-  if ($errCode != 0) {
-    returnJson(400, $sessionData['errmsg'] ?? '用户登录失败');
+  foreach ($urls as $url) {
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_multi_add_handle($mh, $ch);
+    $handles[] = $ch;
   }
-  return $sessionData;
+
+  // 执行请求
+  do {
+    curl_multi_exec($mh, $running);
+    curl_multi_select($mh);
+  } while ($running > 0);
+
+  // 获取结果
+  $results = [];
+  foreach ($handles as $ch) {
+    $results[] = json_decode(curl_multi_getcontent($ch), true);
+    curl_multi_remove_handle($mh, $ch);
+    curl_close($ch);
+  }
+  curl_multi_close($mh);
+
+  // 验证结果
+  if (empty($results[0]['access_token'])) {
+    returnJson(400, '获取 access_token 失败');
+  }
+
+  if (isset($results[1]['errcode']) && $results[1]['errcode'] != 0) {
+    returnJson(400, $results[1]['errmsg'] ?? '获取 session 信息失败');
+  }
+
+  return [
+    'access_token' => $results[0]['access_token'],
+    'openid' => $results[1]['openid'],
+    'session_key' => $results[1]['session_key']
+  ];
 }
 
 
